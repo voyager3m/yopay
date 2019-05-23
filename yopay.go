@@ -126,6 +126,13 @@ type YoAPI struct {
 	   * "https://41.220.12.206/services/yopaymentsdev/task.php" For Sandbox tests
 	*/
 	YoUrl string
+
+	/** LastQuery, LastResponse, LastError - for debug
+	 */
+	LastQuery      string
+	LastResponse   string
+	LastError      string
+	LastStatusCode int
 }
 
 type DepositResponse struct {
@@ -261,6 +268,10 @@ func NewYoApi(Username, Password string) YoAPI {
 }
 
 func (api *YoAPI) GetXmlResponse(xmlbody string) ([]byte, error) {
+	api.LastQuery = xmlbody
+	api.LastError = ""
+	api.LastResponse = ""
+	api.LastStatusCode = 0
 	var result []byte
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -275,15 +286,19 @@ func (api *YoAPI) GetXmlResponse(xmlbody string) ([]byte, error) {
 	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Printf("[ERROR] do query: %+v", err)
+		api.LastError = fmt.Sprintf("do quqey: %v", err)
+		fmt.Println(api.LastError)
 		return result, err
 	}
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Printf("query response: %s", body)
+	//fmt.Printf("query response: %s", body)
 
+	api.LastStatusCode = resp.StatusCode
+	api.LastResponse = string(body)
 	if resp.StatusCode != 200 {
-		return result, fmt.Errorf("Wrong xml response status %d %s", resp.StatusCode, resp.Status)
+		api.LastError = fmt.Sprintf("Wrong xml response status %d %s", resp.StatusCode, resp.Status)
+		return result, fmt.Errorf(api.LastError)
 	}
 	//fmt.Println("response Status:", resp.Status)
 	//fmt.Println("response Headers:", resp.Header)
