@@ -139,7 +139,7 @@ type DepositResponse struct {
 	Status                    string `xml:"Status"`
 	StatusCode                string `xml:"StatusCode"`
 	StatusMessage             string `xml:"StatusMessage"`
-	TransactionStatus         string `xml:"TransactionStatus"`
+	TransactionStatus         string `xml:"TransactionStatus,omitempty"`
 	ErrorMessageCode          string `xml:"ErrorMessageCode,omitempty"`
 	ErrorMessage              string `xml:"ErrorMessage,omitempty"`
 	TransactionReference      string `xml:"TransactionReference,omitempty"`
