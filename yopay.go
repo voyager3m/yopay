@@ -276,7 +276,7 @@ func (api *YoAPI) GetXmlResponse(xmlbody string) ([]byte, error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	timeout := time.Duration(120 * time.Second)
+	timeout := time.Duration(180 * time.Second)
 	client := &http.Client{Timeout: timeout, Transport: tr}
 	req, err := http.NewRequest("POST", api.YoUrl, bytes.NewBuffer([]byte(xmlbody)))
 	if err != nil {
