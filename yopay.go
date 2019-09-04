@@ -133,6 +133,11 @@ type YoAPI struct {
 	LastResponse   string
 	LastError      string
 	LastStatusCode int
+
+	/* Timeout
+	Default: 180
+	*/
+	QueryTimeout int
 }
 
 type DepositResponse struct {
@@ -262,7 +267,8 @@ func NewYoApi(Username, Password string) YoAPI {
 		Password:               Password,
 		YoUrl:                  "https://paymentsapi1.yo.co.ug/ybs/task.php",
 		DepositTransactionType: "PULL",
-		NonBlocking:            false}
+		NonBlocking:            false,
+		QueryTimeout:           180}
 
 	return yoapi
 }
@@ -276,7 +282,7 @@ func (api *YoAPI) GetXmlResponse(xmlbody string) ([]byte, error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	timeout := time.Duration(180 * time.Second)
+	timeout := time.Duration(time.Duration(api.QueryTimeout) * time.Second)
 	client := &http.Client{Timeout: timeout, Transport: tr}
 	req, err := http.NewRequest("POST", api.YoUrl, bytes.NewBuffer([]byte(xmlbody)))
 	if err != nil {
